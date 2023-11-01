@@ -19,11 +19,14 @@ resource "aws_launch_configuration" "example" {
 	security_groups = ["${aws_security_group.instance.id}","${aws_security_group.ssh.id}","${aws_security_group.elb.id}"]
 
 	key_name  = "myec2key"
-	user_data = <<-EOF
-		#!/bin/bash
-		echo "Hello World" > index.html
-		nohup busybox httpd -f -p "${var.s_port}" &
-		EOF
+	
+	user_data = "${data.template_file.user_data.rendered}"
+
+	#user_data = <<-EOF
+	#	#!/bin/bash
+	#	echo "Hello World" > index.html
+	#	nohup busybox httpd -f -p "${var.s_port}" &
+	#	EOF
 
 	lifecycle {
 		create_before_destroy = true
@@ -129,7 +132,25 @@ resource "aws_security_group" "elb" {
 	#}
 }
 
+#backend S3 get some data from RDS Mysql instance
+data "terraform_remote_state" "db" {
+	backend = "s3"
+	config = {
+		bucket = "tf-up-n-running-state-pehks1980"
+		key = "stage/data-stores/mysql/terraform.tfstate"
+		region = "us-east-1"
+	}
+}
 
+#user_data as data record
+data "template_file" "user_data" {
+	template = "${file("user-data.sh")}"
+	vars = {
+		s_port = "${var.s_port}"
+		dbaddress = "${data.terraform_remote_state.db.outputs.dbaddress}"
+		dbport = "${data.terraform_remote_state.db.outputs.dbport}"
+	}
+}
 
 output "public_dns" {
 	value = "${aws_elb.example.dns_name}"
