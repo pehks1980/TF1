@@ -108,28 +108,32 @@ resource "aws_elb" "example" {
 }
 
 #ELB sec_group to allow 80 port
-
 resource "aws_security_group" "elb" {
   name        = "${var.cluster_name}-ELBSecurityGroup"
   description = "Allow 80 for ELB access"
-  
-  	ingress {
-    		from_port   = 80
-    		to_port     = 80
-    		protocol    = "tcp"
-    		cidr_blocks = ["0.0.0.0/0"] # You can restrict this to your specific IP range for better security
- 	}
-	
-	egress {
-		from_port   = 0
-    		to_port     = 0
-    		protocol    = "-1"
-    		cidr_blocks = ["0.0.0.0/0"] 
-	}
+}
 
-	#lifecycle {
-	#	create_before_destroy = true
-	#}
+resource "aws_security_group_rule" "allow_http_in" { 
+  	type = "ingress" 
+	security_group_id = "${aws_security_group.elb.id}"
+    		
+	from_port   = 80
+    	to_port     = 80
+    	protocol    = "tcp"
+    	cidr_blocks = ["0.0.0.0/0"] # You can restrict this to your specific IP range for better security
+}
+
+resource "aws_security_group_rule" "allow_all_out" {  
+	
+	security_group_id = "${aws_security_group.elb.id}"
+    		
+	type = "egress" 
+	
+	from_port   = 0
+    	to_port     = 0
+    	protocol    = "-1"
+    	cidr_blocks = ["0.0.0.0/0"] 
+
 }
 
 #backend S3 get some data from RDS Mysql instance
@@ -152,7 +156,7 @@ data "template_file" "user_data" {
 	}
 }
 
-output "public_dns" {
-	value = "${aws_elb.example.dns_name}"
-}
+#output "public_dns" {
+#	value = "${aws_elb.example.dns_name}"
+#}
 
