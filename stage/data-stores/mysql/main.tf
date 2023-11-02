@@ -11,15 +11,20 @@ provider "aws" {
 	region = "us-east-1"
 }
 
-resource "aws_db_instance" "example" {
-	identifier_prefix = "tf-upnrun"
-	skip_final_snapshot = true
-	engine = "mysql"
-	allocated_storage = 5
-	instance_class = "db.t2.micro"
-	db_name = var.dbname
-	username = "${var.dbuser}"
-	password = "${var.dbpasswd}"
+module "db_data_store" {
+        source = "../../../modules/data-stores/mysql"
+        
+	dbname  	= var.dbname
+	dbuser  	= var.dbuser
+	dbpasswd 	= var.dbpasswd
+
+	db_rem_state_bucket 	= var.db_rem_state_bucket
+	db_rem_state_bucket_key = var.db_rem_state_bucket_key
+	
+	db_rds_name 		= var.db_rds_name
+	allocated_storage 	= var.allocated_storage
+	instance_class 		= var.instance_class 
+	#output
+	#dbaddress		= aws_db_instance.example.address
+	#dbport			= aws_db_instance.example.port
 }
-
-
