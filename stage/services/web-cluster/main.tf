@@ -3,7 +3,8 @@ provider "aws" {
 }
 
 module "web_cluster" {
-	source = "../../../modules/services/web-cluster"
+	#source = "../../../modules/services/web-cluster"
+	source = "git::https://github.com/pehks1980/TF1-web_cluster.git//web-cluster?ref=v0.0.1"
 	cluster_name = var.cluster_name
 	db_remote_state_bucket = var.db_remote_state_bucket
 	db_remote_state_bucket_key = var.db_remote_state_bucket_key
