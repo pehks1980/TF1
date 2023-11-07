@@ -12,9 +12,9 @@ data "aws_availability_zones" "all" {
 #	default = "8081"
 #}
 
-#test branch
+#test branch v.0.0.2
 resource "aws_launch_configuration" "example" {
-	image_id = "ami-40d28157"
+	image_id = var.ami #"ami-40d28157"
 	instance_type = var.instance_type
 
 	security_groups = ["${aws_security_group.instance.id}","${aws_security_group.ssh.id}","${aws_security_group.elb.id}"]
@@ -35,7 +35,7 @@ resource "aws_launch_configuration" "example" {
 }	
 
 resource "aws_security_group" "instance" {
-	name = "${var.cluster_name}-tf1-example-instance"
+	name_prefix = "${var.cluster_name}-tf1-example-instance"
 	ingress {
 		from_port = "${var.s_port}"
 		to_port = "${var.s_port}"
@@ -50,8 +50,8 @@ resource "aws_security_group" "instance" {
 }
 
 resource "aws_security_group" "ssh" {
-  name        = "${var.cluster_name}-SSHSecurityGroup"
-  description = "Allow SSH access"
+  name_prefix = "${var.cluster_name}-SSHSecurityGroup"
+  description = "Allow SSH access v.0.0.2"
   
   	ingress {
     		from_port   = 22
@@ -69,6 +69,8 @@ resource "aws_security_group" "ssh" {
 resource "aws_autoscaling_group" "example" {
 	#get linked launch config with resource ubuntu
 	launch_configuration = "${aws_launch_configuration.example.id}"
+	#give a name to ASG
+	name = "${var.cluster_name}-${aws_launch_configuration.example.name}"
         #list all zones
 	availability_zones = ["${data.aws_availability_zones.all.names[0]}","${data.aws_availability_zones.all.names[1]}"]
 	#elb
@@ -78,11 +80,18 @@ resource "aws_autoscaling_group" "example" {
 	#instances range min max for autoscaling
 	min_size = var.min_size
 	max_size = var.max_size
+	#when change wait for new instances created befoere destroy old
+	min_elb_capacity = var.min_size
 
 	tag {
 		key = "${var.cluster_name}-ASG"
 		value = "${var.cluster_name}-tf-asg-example"
 		propagate_at_launch = true
+	}
+	#create changed then destroy zero downtime policy
+	#should be switched as well on all dependant things elb sg etc
+	lifecycle {
+	  create_before_destroy = true
 	}
 } 
 
@@ -105,13 +114,21 @@ resource "aws_elb" "example" {
 		interval = 30
 		target = "HTTP:${var.s_port}/"
 	}
+	
+	lifecycle {
+          create_before_destroy = true
+        }
 
 }
 
 #ELB sec_group to allow 80 port
 resource "aws_security_group" "elb" {
-  name        = "${var.cluster_name}-ELBSecurityGroup"
-  description = "Allow 80 for ELB access"
+  name_prefix = "${var.cluster_name}-ELBSecurityGroup"
+  description = "Allow 80 for ELB access. v0.0.3"
+	
+  lifecycle {
+        create_before_destroy = true
+  }
 }
 
 resource "aws_security_group_rule" "allow_http_in" { 
@@ -154,6 +171,7 @@ data "template_file" "user_data" {
 		s_port = "${var.s_port}"
 		dbaddress = "${data.terraform_remote_state.db.outputs.dbaddress}"
 		dbport = "${data.terraform_remote_state.db.outputs.dbport}"
+		servertext = var.servertext
 	}
 }
 
