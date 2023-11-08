@@ -40,3 +40,8 @@ variable "instance_class" {
         description = "instance_class - db.t2.micro"
 	type = string
 }
+
+variable "aws_region" {
+        description = "aws_region"
+        type = string
+}

@@ -19,7 +19,7 @@ variable "dbname" {
 
 variable "db_rem_state_bucket" {
         description = "db_rem_state_bucket S3"
-	default = "tf-up-n-running-state-pehks1980"
+	default = "tf-up-n-running-state-pehks19801"
 	type = string
 }
 
@@ -45,5 +45,11 @@ variable "allocated_storage" {
 variable "instance_class" {
         description = "instance_class - db.t2.micro"
 	default = "db.t2.micro"
+	type = string
+}
+
+variable "aws_region" {
+        description = "aws_region"
+	default = "us-west-1"
 	type = string
 }

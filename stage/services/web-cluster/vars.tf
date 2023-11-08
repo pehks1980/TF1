@@ -6,7 +6,7 @@ variable "cluster_name" {
 
 variable "db_remote_state_bucket" {
 	description = "S3 bucket name for mysql db remote tfstate " 
-	default     = "tf-up-n-running-state-pehks1980"
+	default     = "tf-up-n-running-state-pehks19801"
 	type        = string
 }
 
@@ -39,6 +39,12 @@ variable "ami" {
   description 	= "Ami image name"
   type          = string
   default 	= "ami-40d28157"
+}
+
+variable "aws_region" {
+  description 	= "AWS region"
+  type          = string
+  default 	= "us-west-1" #"us-east-1"
 }
 
 variable "servertext" {

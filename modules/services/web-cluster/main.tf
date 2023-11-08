@@ -3,15 +3,6 @@ data "aws_availability_zones" "all" {
 
 }
 
-#provider "aws" { #not in module
-#  region = "us-east-1"
-#}
-
-#variable "s_port" {
-#	description = "server listen port (http)"
-#	default = "8081"
-#}
-
 #test branch v.0.0.2
 resource "aws_launch_configuration" "example" {
 	image_id = var.ami #"ami-40d28157"
@@ -160,7 +151,7 @@ data "terraform_remote_state" "db" {
 	config = {
 		bucket = var.db_remote_state_bucket
 		key = var.db_remote_state_bucket_key
-		region = "us-east-1"
+		region = var.aws_region
 	}
 }
 
