@@ -1,4 +1,4 @@
 #show dns name
 output "public_dns" {
-        value = "${aws_elb.example.dns_name}"
+        value = "${aws_lb.example.dns_name}"
 }
