@@ -6,7 +6,7 @@ variable "cluster_name" {
 
 variable "db_remote_state_bucket" {
 	description = "S3 bucket name for mysql db remote tfstate " 
-	default     = "tf-up-n-running-state-pehks19801"
+	default     = "tf-state-pehks19801"
 	type        = string
 }
 

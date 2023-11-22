@@ -19,7 +19,7 @@ variable "dbname" {
 
 variable "db_rem_state_bucket" {
         description = "db_rem_state_bucket S3"
-	default = "tf-up-n-running-state-pehks19801"
+	default = "tf-state-pehks19801"
 	type = string
 }
 

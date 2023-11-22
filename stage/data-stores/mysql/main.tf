@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "tf-up-n-running-state-pehks19801"
+    bucket = "tf-state-pehks19801"
     key = "stage/data-stores/mysql/terraform.tfstate"
     region = "us-west-1" 
     encrypt = "true"
